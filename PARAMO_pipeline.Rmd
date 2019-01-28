@@ -314,8 +314,7 @@ library("phytools")
 # plot head character
 plotSimmap(L2.maps$head[[1]], pts=F,ftype="off", ylim=c(0,100) )
 title("\n Head character")
-plot(c(1:10), c(1:10))
-title("Head character")
+
 
 # plot entire phenotype character
 library("RColorBrewer")
@@ -327,8 +326,8 @@ lapply(tmm$maps, names) %>% unlist %>% unique->states
 hm.palette <- colorRampPalette(brewer.pal(9, 'Set1'), space='Lab')
 color<-hm.palette(length(states))
 
-plotSimmap(tmm, setNames(color, states),  lwd=3, pts=F,ftype="off")
-title("Entire Phenotype character")
+plotSimmap(tmm, setNames(color, states),  lwd=3, pts=F,ftype="off", ylim=c(0,100))
+title("\n Entire Phenotype character")
 ```
 
 
