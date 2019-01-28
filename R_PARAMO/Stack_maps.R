@@ -12,9 +12,10 @@ F1<-F.obj
 cc<-sub("CHAR:", "C",
        get_descendants_chars(ONT, annotations="manual", level2[3] )  )
 
-ntrees<-1
+ntrees<-100
 tr<-vector("list", ntrees)
 
+setwd("~/Documents/Recon-Anc_Anat/Supplementary_materials/STEP_5/Discr_maps")
 i=1
 for (i in 1:ntrees){
   
@@ -26,7 +27,7 @@ for (i in 1:ntrees){
     
     #con<-unz("CHAR-7.zip", filename="CHAR-7_1.rds")
     print(paste0("Reading ", paste0(cc[j], ".zip"), " and ", fl[j]))
-    con<-unz(paste0(cc[j], ".zip"), filename=fl[j])
+    con<-unz(paste0(cc[j], ".zip"), filename=paste0(dirW, fl[j]) )
     con2 <- gzcon(con)
     stack.L[[j]] <- readRDS(con2)
     close(con)
@@ -35,7 +36,21 @@ for (i in 1:ntrees){
   tr[[i]]<- stack_stm(stack.L)
 }
 
-plot(tr[[1]])
+
+pdf(file='test.pdf')
+svg(filename='test.svg')
+png(filename='test.png')
+jpeg(filename='test.jpg')
+plot(tr[[1]], pts=F,ftype="off")
+dev.off()
+
+library("png", lib.loc="/Library/Frameworks/R.framework/Versions/3.5/Resources/library")
+library("jpeg", lib.loc="/Library/Frameworks/R.framework/Versions/3.5/Resources/library")
+img <- readPNG(system.file("img", "test.png", package="png"))
+img <- readJPEG(system.file("img", "test.jpg", package="jpeg"))
+img<-readJPEG( "test.jpg")
+rasterImage(img)
+plot(img)
 
 library("RColorBrewer", lib.loc="/Library/Frameworks/R.framework/Versions/3.5/Resources/library")
 z<-tr[[1]]

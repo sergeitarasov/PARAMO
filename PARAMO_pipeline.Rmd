@@ -10,7 +10,6 @@ bibliography: bibliography.bib
 ***P**hylogenetic **A**ncestral **R**econstruction of **A**natomy by **M**apping **O**ntologies*
 
 ```{r setup, include=FALSE}
-setwd("~/Documents/Recon-Anc_Anat/Supplementary_materials")
 library("knitr", lib.loc="/Library/Frameworks/R.framework/Versions/3.5/Resources/library")
 library("magrittr", lib.loc="/Library/Frameworks/R.framework/Versions/3.5/Resources/library")
 library(kableExtra)
@@ -28,12 +27,12 @@ The nexus file of the intial matrix can be found at `STEP_1/Step1_matrix.nex` an
 ```{r table, echo=FALSE}
 CH<-read.csv(file="STEP_1/Char_info.csv", header = T, as.is=T, check.names=F)
 
-kable(CH, caption = 'Initial characters. CHAR*- char id in Sharkey et al. (2012) ')%>%
-  kable_styling(full_width = F, font_size=11) %>%
-  column_spec(1, bold = T) %>%
-  column_spec(6, width = "10em")
-  #column_spec(2, width = "10em")
-  
+# kable(CH, caption = 'Initial characters. CHAR*- char id in Sharkey et al. (2012) ')%>%
+#   kable_styling(full_width = F, font_size=11) %>%
+#   column_spec(1, bold = T) %>%
+#   column_spec(6, width = "10em")
+#   #column_spec(2, width = "10em")
+CH
 ```
 
 Note the follwoing:
@@ -64,10 +63,6 @@ MT<-read.csv("STEP_4/matrix.csv", header = T, row.names=1, as.is=T, check.names=
 MT
 ```
 
-
-```{r eval=FALSE, include=FALSE}
-apply(MT, 2, unique)
-```
 
 # STEP 3. Linking anatomical characters with ontology
 Having initial characters code into anatomical ones, let's now link the charcter with ontology
@@ -122,7 +117,7 @@ L3
 
 # STEP 4. Inference: linking characters with models and tree
 At this step, we need to construct data files for analysing the set of our seven anatomical characters using RevBayes. Three files have to be created for each character: (1) chraracter file, (2) RevBayes script, and (3) tree file that is shared accross all chracters. The process of file cretion can be automitized using the following scripts.
-```{r}
+```{r eval=FALSE, include=TRUE}
 # reading chracter matrix
 MT<-read.csv("STEP_4/matrix.csv", header = T, row.names=1, as.is=T, check.names=F)
 
@@ -185,7 +180,7 @@ Now having created the files for inference using RevBayes we just run them. Each
 # STEP 5. Ontology-informed amalgamation of the stochastic maps
 Before starting ontology-informed amalgamation of characters let us first fix potential issues with maipulating data. TO enable amalgamation we first descriteze each stochastic map - each tree branch is split into small bins, each bin contains infroamtion what characer state it is in. The dicretization facilitates character amalgamation but subtantially increseas file size.To make the computations efficient we keep stm file in zip archives. 
 
-```{r}
+```{r eval=FALSE}
 library("phytools")
 # we use a set of precooked functions to work with stoch. maps
 source("R_PARAMO/Functions_Discr_maps.R")
@@ -267,9 +262,12 @@ for (i in 1:length(c))
 ```
 
 Now having stochastic maps in proper format we can start their ontology-guided amalgamation
-```{r}
-source("R_PARAMO/Functions_Discr_maps.R")
+```{r results='hide'}
+source("R_PARAMO/Functions_Stack_maps.R")
 
+# dir to write and read files
+dirW= ("STEP_5/Discr_maps/")
+dirR= ("STEP_4/RevBayes/output/")
 #############
 # Level 2 stacks - main body parts
 #############
@@ -277,16 +275,15 @@ level2
 cc<-lapply(L2, function(x) sub("CHAR:", "C", x) )
 cc<-lapply(cc, function(x) sub(",", "-", x) )
 
-cc<-sub("CHAR:", "C",
-      get_descendants_chars(ONT, annotations="manual", level2[3] )  )
 
 L2.maps<-vector("list", length(L2))
 names(L2.maps)<-names(L2)
 
 # batch stacking
+
 for (i in 1:length(L2.maps))
 {
-  map<-paramo(cc[[i]], ntrees=10, dirW=dirW)
+  map<-paramo(cc[[i]], ntrees=1, dirW=dirW)
   L2.maps[[i]]<-map
 }
 
@@ -313,15 +310,27 @@ for (i in 1:length(L3.maps))
 
 
 ```{r}
-plot(L2.maps$head[[1]], pts=F,ftype="off")
+library("phytools")
+# plot head character
+plotSimmap(L2.maps$head[[1]], pts=F,ftype="off", ylim=c(0,100) )
+title("\n Head character")
+plot(c(1:10), c(1:10))
+title("Head character")
+
+# plot entire phenotype character
+library("RColorBrewer")
+tmm<-L3.maps$whole_organism[[1]]
+lapply(tmm$maps, names) %>% unlist %>% unique->states
+# number of states in the character
+#length(states)
+
+hm.palette <- colorRampPalette(brewer.pal(9, 'Set1'), space='Lab')
+color<-hm.palette(length(states))
+
+plotSimmap(tmm, setNames(color, states),  lwd=3, pts=F,ftype="off")
+title("Entire Phenotype character")
 ```
 
-
-Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Cmd+Option+I*.
-
-When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Cmd+Shift+K* to preview the HTML file). 
-
-The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
 
 
 # References
