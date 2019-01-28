@@ -1,0 +1,292 @@
+#NEXUS
+[written Sun Jan 27 14:37:21 EST 2019 by Mesquite  version 3.51 (build 898) at starasovs-MacBook-Pro.local/192.168.0.14]
+
+BEGIN TAXA;
+	TITLE Taxa;
+	DIMENSIONS NTAX=87;
+	TAXLABELS
+		Acanthochalcis Aleiodes Anacharis Archaeoteleia Athalia Aulacus Australomymar Austroserphus Belyta Brachygaster Cales Cephalcia Cephalonomia Cephus Ceraphron Chiloe Cirrospilus Cleonymus Coccobius Coccophagus Corynis Decameria Diplolepis Doryctes Dusona Eurytoma Evania Evaniella Foersterella Gasteruption Gonatocerus Hartigia Helorus Heteroperreyia Ibalia Ismarus Isostasius Labena Lagynodes Lymeon Maaminga Macroxyela Megalyra Megaspilus Megastigmus Megischus Melanips Metapolybia Monoctenus Monomachus Mymaromma Nasonia Notofenusa Onycholyda Orthogonalys Orussobaius Orussus Pantolytomyia Parnips Pelecinus Periclistus Pimpla Pison Poecilopsilus Pristaulacus Proctotrupes Proplatygaster Pseudofoenus Psilocharis Rhopalosoma Rhysipolis Ropronia Runaria Sapyga Schlettererius Sirex Stangeella Sterictiphora Syntexis Telenomus Tenthredo Tremex Vanhornia Wroughtonia Xiphydria Xyela Zagryphus 
+	;
+
+END;
+
+
+BEGIN CHARACTERS;
+	TITLE  Character_Matrix;
+	DIMENSIONS  NCHAR=9;
+	FORMAT DATATYPE = STANDARD GAP = - MISSING = ? SYMBOLS = "  0 1";
+	CHARSTATELABELS 
+		1 'Notch on medial margin of eye (ch-3)' /  absent present,
+		2 'Position of labrum (ch-23)' /  anterior posterior,
+		3 'Labrum (ch-25)' /  absent present,
+		4 'Forewing  costal and radial vein fusion (ch-353)' /  'not_fused' 'fused_along_their_lengths',
+		5 ' Hind wing  subcostal  SC  vein, absent (ch-363a)' /  no yes,
+		6 'Hind wing  subcostal  SC  vein, present  (ch-363b)' /  yes no,
+		7 'Inner posterior mesotibial spur (ch-380)' /  simple modified_into_a_calcar,
+		8 'Foretibial apical sensillum (ch-381)' /  present absent,
+		9 'Metatibial apical sensillum (ch-382)' /  present absent ; 
+	MATRIX
+	Acanthochalcis  011011001
+	Aleiodes        1111110??
+	Anacharis       0110110??
+	Archaeoteleia   0110110??
+	Athalia         011011001
+	Aulacus         011011011
+	Australomymar   ?11??????
+	Austroserphus   0110110??
+	Belyta          0110110??
+	Brachygaster    0??011011
+	Cales           0110110??
+	Cephalcia       ?11??????
+	Cephalonomia    0-00111??
+	Cephus          011011011
+	Ceraphron       0???111??
+	Chiloe          ?11??????
+	Cirrospilus     0110110??
+	Cleonymus       0110110??
+	Coccobius       ?11011???
+	Coccophagus     0110110??
+	Corynis         ?11??????
+	Decameria       ?11??????
+	Diplolepis      0110110??
+	Doryctes        0111110??
+	Dusona          0??1110??
+	Eurytoma        0??0110??
+	Evania          011011011
+	Evaniella       0??011011
+	Foersterella    ?11??????
+	Gasteruption    011011011
+	Gonatocerus     0110110??
+	Hartigia        ?11??????
+	Helorus         011011011
+	Heteroperreyia  011??????
+	Ibalia          011011001
+	Ismarus         0??011???
+	Isostasius      0??0110??
+	Labena          1??1110??
+	Lagynodes       011???0??
+	Lymeon          0111110??
+	Maaminga        0110110??
+	Macroxyela      001000011
+	Megalyra        011011000
+	Megaspilus      0??1110??
+	Megastigmus     0110110??
+	Megischus       011011???
+	Melanips        0110110??
+	Metapolybia     111011011
+	Monoctenus      011011011
+	Monomachus      011011???
+	Mymaromma       011?110??
+	Nasonia         0110110??
+	Notofenusa      0??011011
+	Onycholyda      011000011
+	Orthogonalys    011011011
+	Orussobaius     011??????
+	Orussus         0110110??
+	Pantolytomyia   011011???
+	Parnips         0??0110??
+	Pelecinus       0110110??
+	Periclistus     011011011
+	Pimpla          0??1110??
+	Pison           1110110??
+	Poecilopsilus   0110110??
+	Pristaulacus    0110110??
+	Proctotrupes    ?11011011
+	Proplatygaster  0110110??
+	Pseudofoenus    0110110??
+	Psilocharis     ?11??????
+	Rhopalosoma     1??111011
+	Rhysipolis      1111110??
+	Ropronia        0110110??
+	Runaria         ?11??????
+	Sapyga          1-00110??
+	Schlettererius  011011?01
+	Sirex           ?11??????
+	Stangeella      011011000
+	Sterictiphora   ?11??????
+	Syntexis        011011011
+	Telenomus       0????????
+	Tenthredo       ?11??????
+	Tremex          011011011
+	Vanhornia       011011???
+	Wroughtonia     0111110??
+	Xiphydria       0110110?1
+	Xyela           ?01000011
+	Zagryphus       0??1110??
+
+;
+
+END;
+BEGIN ASSUMPTIONS;
+	TYPESET * UNTITLED   =  unord:  1- 9;
+
+END;
+
+BEGIN MESQUITECHARMODELS;
+	ProbModelSet * UNTITLED   =  'Mk1 (est.)':  1- 9;
+END;
+
+Begin MESQUITE;
+		MESQUITESCRIPTVERSION 2;
+		TITLE AUTO;
+		tell ProjectCoordinator;
+		timeSaved 1548617846470;
+		getEmployee #mesquite.minimal.ManageTaxa.ManageTaxa;
+		tell It;
+			setID 0 6110986574958637788;
+		endTell;
+		getEmployee #mesquite.charMatrices.ManageCharacters.ManageCharacters;
+		tell It;
+			setID 0 2526742000770224730;
+			tell It;
+				setDefaultOrder  0 1 2 3 4 8 5 6 7;
+				attachments ;
+			endTell;
+			mqVersion 351;
+			checksumv 0 3 229124851 null  getNumChars 9 numChars 9 getNumTaxa 87 numTaxa 87   short true   bits 3   states 3   sumSquaresStatesOnly 1552.0 sumSquares 1552.0 longCompressibleToShort false usingShortMatrix true   NumFiles 1 NumMatrices 1;
+			mqVersion;
+		endTell;
+		getWindow;
+		tell It;
+			suppress;
+			setResourcesState false false 165;
+			setPopoutState 300;
+			setExplanationSize 0;
+			setAnnotationSize 0;
+			setFontIncAnnot 0;
+			setFontIncExp 0;
+			setSize 1280 673;
+			setLocation 0 23;
+			setFont SanSerif;
+			setFontSize 10;
+			getToolPalette;
+			tell It;
+			endTell;
+			desuppress;
+		endTell;
+		getEmployee  #mesquite.charMatrices.BasicDataWindowCoord.BasicDataWindowCoord;
+		tell It;
+			showDataWindow #2526742000770224730 #mesquite.charMatrices.BasicDataWindowMaker.BasicDataWindowMaker;
+			tell It;
+				getWindow;
+				tell It;
+					setExplanationSize 30;
+					setAnnotationSize 20;
+					setFontIncAnnot 0;
+					setFontIncExp 0;
+					setSize 1115 601;
+					setLocation 0 23;
+					setFont SanSerif;
+					setFontSize 10;
+					getToolPalette;
+					tell It;
+						setTool mesquite.charMatrices.BasicDataWindowMaker.BasicDataWindow.arrow;
+					endTell;
+					setActive;
+					setTool mesquite.charMatrices.BasicDataWindowMaker.BasicDataWindow.arrow;
+					colorCells  #mesquite.charMatrices.NoColor.NoColor;
+					colorRowNames  #mesquite.charMatrices.TaxonGroupColor.TaxonGroupColor;
+					colorColumnNames  #mesquite.charMatrices.CharGroupColor.CharGroupColor;
+					colorText  #mesquite.charMatrices.NoColor.NoColor;
+					setBackground White;
+					toggleShowNames off;
+					toggleShowTaxonNames on;
+					toggleTight off;
+					toggleThinRows off;
+					toggleShowChanges on;
+					toggleSeparateLines off;
+					toggleShowStates on;
+					toggleAutoWCharNames on;
+					toggleAutoTaxonNames off;
+					toggleShowDefaultCharNames off;
+					toggleConstrainCW on;
+					toggleBirdsEye off;
+					toggleShowPaleGrid off;
+					toggleShowPaleCellColors off;
+					toggleShowPaleExcluded off;
+					togglePaleInapplicable on;
+					toggleShowBoldCellText off;
+					toggleAllowAutosize on;
+					toggleColorsPanel off;
+					toggleDiagonal on;
+					setDiagonalHeight 80;
+					toggleLinkedScrolling on;
+					toggleScrollLinkedTables off;
+				endTell;
+				showWindow;
+				getWindow;
+				tell It;
+					forceAutosize;
+				endTell;
+				getEmployee #mesquite.charMatrices.AlterData.AlterData;
+				tell It;
+					toggleBySubmenus off;
+				endTell;
+				getEmployee #mesquite.charMatrices.ColorByState.ColorByState;
+				tell It;
+					setStateLimit 9;
+					toggleUniformMaximum on;
+				endTell;
+				getEmployee #mesquite.charMatrices.ColorCells.ColorCells;
+				tell It;
+					setColor Red;
+					removeColor off;
+				endTell;
+				getEmployee #mesquite.categ.StateNamesEditor.StateNamesEditor;
+				tell It;
+					makeWindow;
+					tell It;
+						getTable;
+						tell It;
+							rowNamesWidth 329;
+						endTell;
+						setExplanationSize 30;
+						setAnnotationSize 20;
+						setFontIncAnnot 0;
+						setFontIncExp 0;
+						setSize 1115 601;
+						setLocation 0 23;
+						setFont SanSerif;
+						setFontSize 10;
+						getToolPalette;
+						tell It;
+							setTool mesquite.categ.StateNamesEditor.StateNamesWindow.ibeam;
+						endTell;
+						rowsAreCharacters on;
+						toggleConstrainChar on;
+						toggleConstrainCharNum 3;
+						togglePanel off;
+						toggleSummaryPanel off;
+					endTell;
+					showWindow;
+				endTell;
+				getEmployee #mesquite.categ.StateNamesStrip.StateNamesStrip;
+				tell It;
+					showStrip off;
+				endTell;
+				getEmployee #mesquite.charMatrices.AnnotPanel.AnnotPanel;
+				tell It;
+					togglePanel off;
+				endTell;
+				getEmployee #mesquite.charMatrices.CharReferenceStrip.CharReferenceStrip;
+				tell It;
+					showStrip off;
+				endTell;
+				getEmployee #mesquite.charMatrices.QuickKeySelector.QuickKeySelector;
+				tell It;
+					autotabOff;
+				endTell;
+				getEmployee #mesquite.charMatrices.SelSummaryStrip.SelSummaryStrip;
+				tell It;
+					showStrip off;
+				endTell;
+				getEmployee #mesquite.categ.SmallStateNamesEditor.SmallStateNamesEditor;
+				tell It;
+					panelOpen true;
+				endTell;
+			endTell;
+		endTell;
+		endTell;
+end;
+
+

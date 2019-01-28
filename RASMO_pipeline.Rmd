@@ -1,0 +1,329 @@
+---
+title: "PARAMO pipeline"
+output:
+  html_notebook: default
+  html_document:
+    df_print: paged
+  pdf_document: default
+bibliography: bibliography.bib
+---
+***P**hylogenetic **A**ncestral **R**econstruction of **A**natomy by **M**apping **O**ntologies*
+
+```{r setup, include=FALSE}
+setwd("~/Documents/Recon-Anc_Anat/Supplementary_materials")
+library("knitr", lib.loc="/Library/Frameworks/R.framework/Versions/3.5/Resources/library")
+library("magrittr", lib.loc="/Library/Frameworks/R.framework/Versions/3.5/Resources/library")
+library(kableExtra)
+###--- Update the knitr working directory (R works from the project folder, knitr works in the rmd folder)
+dd <- getwd()
+knitr::opts_knit$set(root.dir= paste(dd,'/../../')) 
+#opts_knit$set(root.dir=normalizePath('../'))
+```
+
+
+# STEP 1. Initial character matrix
+Our initial character matrix consists of a sample of 9 characters scored for 87 taxa of Hymenoptera. These characters are taken from the large Hymenoptera dataset of  @sharkey2012phylogenetic and slightly modified for the demonstrative purpose.
+The nexus file of the intial matrix can be found at `STEP_1/Step1_matrix.nex` and viewed using, for example, [Mesquite](http://www.mesquiteproject.org). Herein, in describing characters, the follwoing notion is used $C_\#\{S_1,S_2,...\}$ where $C_\#$ stands for a character ID and $S_1, S_2, ...$ stand for character states. Let us have a look at the character report.
+
+```{r table, echo=FALSE}
+CH<-read.csv(file="STEP_1/Char_info.csv", header = T, as.is=T, check.names=F)
+
+kable(CH, caption = 'Initial characters. CHAR*- char id in Sharkey et al. (2012) ')%>%
+  kable_styling(full_width = F, font_size=11) %>%
+  column_spec(1, bold = T) %>%
+  column_spec(6, width = "10em")
+  #column_spec(2, width = "10em")
+  
+```
+
+Note the follwoing:
+
+* $C_2\{0,1\}$ is anatomically dependent on $C_3\{0\}$. This dependecy is indicated as $<$ or $>$ depending on the direction of the dependecy. The anatomical (hierrachical) dependecy means that states $C_2\{0,1\}$ appear immediately as $C_3$ swithches to the state $C_3\{0\}$. This type of dependecy has been known as the tail-color problem and is usually coded using inapplicable coding $-$ for $C_2\{0,1\}$ when $C_3\{0\}$ is present (XXX).
+* $C_5$ and $C_6$ are subjected to synchronous changes, which means tha the states of this characters are mutually exclusive and hence dependent because one trait is coded using absent/present coding. The synchronous dpenedecy is indicated as $<>$; the notation $C_5\{0,1\}<>C_6\{1,0\}$ means -- if $C_5$ is $\{0\}$ then $C_6$ is $\{0\}$, and if $C_5$ is $\{1\}$ then $C_6$ is $\{1\}$. This type of dependecy occurs due to absent/present coding.
+* The symbol $"?"$ indicates an ambigous of polymorphic coding (the two codings are equvalent). For some characters (indicated in the table) the state $"-"$ also means $"?"$. The ambiguous coding means that any of the coded state are possible for the species with $"?"$. For example, for $C_1\{0,1\}$, the symbol $"?"$ means either $"0"$ or $"1"$.
+
+
+# STEP 2. Incorporating anatomical dependencies
+
+* $C_3 \oplus C_2=C_{3,2}\{00,01,10,11\}$  which are coded in the matrix as  $C_{3,2}\{0\&1,0\&1,2,3\}$. Make it the same character state at the tail problem
+* $C_5$ and $C_6$ are coded based on synchronous change to the binary character $C_{5,6}\{0,1\}$
+
+The matrix can be found in `STEP_2/Step2_matrix.nex`
+Char_info_step_2.csv
+```{r}
+
+
+CH2<-read.csv(file="STEP_2/Char_info_step_2.csv", header = T, as.is=T, check.names=F)
+CH2
+# kable(CH2, caption = 'Anatomical characters. CHAR*- char id in Sharkey et al. (2012) ')%>%
+#   kable_styling(full_width = F, font_size=11) %>%
+#   column_spec(1, bold = T) 
+
+# characters matrix
+MT<-read.csv("STEP_4/matrix.csv", header = T, row.names=1, as.is=T, check.names=F)
+MT
+```
+
+
+```{r eval=FALSE, include=FALSE}
+apply(MT, 2, unique)
+```
+
+# STEP 3. Linking anatomical characters with ontology
+Having initial characters code into anatomical ones, let's now link the charcter with ontology
+
+Hymenoptera Anatomy Ontology [HAO](http://portal.hymao.org/projects/32/public/ontology/)
+
+Let's read annotations and display them as a  table.
+```{r}
+AN<-read.csv(file="STEP_3/Char_annotation.csv", header = T, as.is=T, check.names=F)
+AN
+```
+
+
+Our goal is to assess the anatomical evolution at three levels of resolution. (1) The first level are 7  elemntary anatomical characters obtained at the previous step. (2) The second level deals with three chracters - "head", "wings" and "legs" - corresponding to the main body parts. (3) The third level corresponds to the enitre organismal phenotype. We construct the characters for the level 2 and 3 by quering the elementary anatomical characters using HAO and amalgamting their stochastic maps. To query HAO, we use `ontologyIndex` package and a set of preccoked `R` functions located in `PARAMO_functions.R`. Let see how it works.
+
+```{r}
+library("ontologyIndex")
+source("R_PARAMO/PARAMO_functions.R")
+
+# opening HAO file, "BFO:0000050" is part_of relatinship
+ONT<-get_OBO("STEP_3/HAO.obo", extract_tags="everything", propagate_relationships = c("BFO:0000050", "is_a"))
+
+# let's create  list of anotation from the annotation table
+char_id<-paste0("CHAR:", AN$CHAR_ID2)
+annot<-set_names(table2list(AN[,c(2,5)]), char_id)
+annot
+
+# next we make the annotations to be the part of the ontology object ONT
+ONT$terms_selected_id<-annot
+```
+
+Now, we can create chracters for the level 2 and 3. They will consist of all characters located on man body parts and entire organism respectively. Firsr, let us construct the vectors for HAO terms that correspond to level 3 and 4.
+```{r}
+level2<-set_names(c("HAO:0000397", "HAO:0001089", "HAO:0000494"), c("head", "wings", "legs") )
+level3<-set_names(c("HAO:0000012"), c("whole_organism") )
+
+# we use get_descendants_chars to get the set of all anatomcal characters that descend from a particular HAO term, for example:
+#get_descendants_chars(ONT, annotations="manual", terms="HAO:0000012")
+
+# now we can query all characters for the level 2 and 3 using the Ontology
+L2<-lapply(level2, function(x)
+  get_descendants_chars(ONT, annotations="manual", terms=x)  )
+"Level 2"
+L2
+
+L3<-lapply(level3, function(x)
+  get_descendants_chars(ONT, annotations="manual", terms=x)  )
+"Level 3"
+L3
+```
+
+
+# STEP 4. Inference: linking characters with models and tree
+At this step, we need to construct data files for analysing the set of our seven anatomical characters using RevBayes. Three files have to be created for each character: (1) chraracter file, (2) RevBayes script, and (3) tree file that is shared accross all chracters. The process of file cretion can be automitized using the following scripts.
+```{r}
+# reading chracter matrix
+MT<-read.csv("STEP_4/matrix.csv", header = T, row.names=1, as.is=T, check.names=F)
+
+# creating chracter files using the matrix
+#setwd("~/Documents/Recon-Anc_Anat/Supplementary_materials/STEP_4/RevBayes/data")
+for (i in 1:ncol(MT))
+{
+  C.rev<-MT[,i]
+  C.rev<-gsub("&", " ", C.rev)
+  
+  out<-cbind(rownames(MT), C.rev)
+  write.table(file=paste0(colnames(MT[i]), ".char"), out, quote=F, sep=" ", 
+              row.names=F, col.names=F)
+}
+
+# write Rev file for the two-state characters
+setwd("~/Documents/Recon-Anc_Anat/Supplementary_materials/STEP_4/RevBayes/")
+
+# For constructing .Rev files we use the procooked template "PARAMO2_templ.Rev"
+fl.in  <- readLines("PARAMO2_templ.Rev")
+
+for (i in 1:ncol(MT))
+{
+  fl.in  <- readLines("PARAMO2_templ.Rev")
+  fl.in  <- gsub(pattern = "@analysis_name@", replace = paste0(colnames(MT[i])),
+                 x = fl.in)
+  fl.in <- gsub(pattern = "@chrs_2_read@", replace = paste0("data/", colnames(MT[i]), ".char"), x = fl.in)
+  
+  cat(file=paste0(colnames(MT[i]), ".Rev"), sep="\n", fl.in)
+
+}
+
+# write Rev file for dependent four-state character C3-2
+setwd("~/Documents/Recon-Anc_Anat/Supplementary_materials")
+
+
+# I use precooked set of functions for constracting SMM from Tarasov (2019)
+source("STEP_4/SMM_functions.R")
+
+###################################
+# same SMMs as for the tail color problem
+###################################
+char.state<-c("a", "p")
+rate.param<-c(1, 1)
+TL<-init_char_matrix(char.state, rate.param, diag.as=0)
+char.state<-c("r", "b")
+rate.param<-c(1, 1)
+COL<-init_char_matrix(char.state, rate.param, diag.as=0)
+
+#SMM-ind
+TC.ind<-comb2matrices(TL, COL, controlling.state=NULL, name.sep="", diag.as="")
+TC.ind
+in.rev<-Mk_Rev(TC.ind)
+cat(in.rev) # COPY the output and insert in Rev template PARAMO2_templ.Rev
+#cat(in.rev, file="STEP_4/input_Rev.txt") # or save this outout to a file and then copy to Rev template
+```
+
+Now having created the files for inference using RevBayes we just run them. Each output consists of four files: log file, ancestral character state reconstruction (asr), and stochastim maps (stm).
+
+# STEP 5. Ontology-informed amalgamation of the stochastic maps
+Before starting ontology-informed amalgamation of characters let us first fix potential issues with maipulating data. TO enable amalgamation we first descriteze each stochastic map - each tree branch is split into small bins, each bin contains infroamtion what characer state it is in. The dicretization facilitates character amalgamation but subtantially increseas file size.To make the computations efficient we keep stm file in zip archives. 
+
+```{r}
+library("phytools")
+# we use a set of precooked functions to work with stoch. maps
+source("R_PARAMO/Functions_Discr_maps.R")
+# let's make character list
+
+c=paste0("C", AN$CHAR_ID2)
+c<-sub(",", "-", c  )
+
+# dir to write and read files
+dirW= ("STEP_5/Discr_maps/")
+dirR= ("STEP_4/RevBayes/output/")
+
+#####################################
+# Read a sample of 100 maps from .stm files and save them in the poper format .stmR
+#####################################
+
+for (i in 1:length(c))
+{
+  tree<-read_Simmap_Rev(paste0(dirR, c[i], ".stm"),
+                        start=400, end=500,
+                        save = NULL) %>% read.simmap(text=., format="phylip")
+  
+  
+  write.simmap(tree, file=paste0(dirW, c[i], ".stmR"))
+}
+##########
+
+#####################################
+# Read stmR, discretize maps, and save each map as a separate rds file; 
+# in turn all rds file for a chracter are stored 
+# in a zip archive
+#####################################
+
+for (i in 1:length(c))
+  { 
+  # read in undesritezed trees
+  print(paste0("Reading ", c[i]))
+  sim=read.simmap(file=paste0(dirW, c[i], ".stmR"), format="phylip")
+  
+  # descritize trees by looping over sample and saving as rds
+
+  for (j in 1:length(sim)){
+    tryCatch({
+      
+      print(paste0("Descritizing tree ", j))
+      
+      ## errors with na
+      
+      ##
+      
+      ##### make trees equal with template
+      sim.d<-make_tree_eq(tree.tmp.final, sim[[j]], round=5)
+      ###
+      
+      #sim.d<-discr_Simmap_all(sim[[j]], 1000)
+      sim.d<-discr_Simmap_all(sim.d, 1000)
+      
+      saveRDS(sim.d, file =  paste0(dirW,c[i], "_", j, ".rds") )
+      
+    }, error=function(e){
+      cat("ERROR :",conditionMessage(e), "\n")
+      #errors<-rbind(errors, c(ii,jj))
+    }  )
+    
+  } 
+  
+  # putting rds files into archive
+  files<-paste0(dirW, c[i], "_", c(1:length(sim)), ".rds")
+  zip(paste0(dirW, c[i], ".zip"), files=files)
+  file.remove(files)
+  
+}
+
+# close connections
+ showConnections (all=T)
+ closeAllConnections()
+#########################
+
+```
+
+Now having stochastic maps in proper format we can start their ontology-guided amalgamation
+```{r}
+source("R_PARAMO/Functions_Discr_maps.R")
+
+#############
+# Level 2 stacks - main body parts
+#############
+level2
+cc<-lapply(L2, function(x) sub("CHAR:", "C", x) )
+cc<-lapply(cc, function(x) sub(",", "-", x) )
+
+cc<-sub("CHAR:", "C",
+      get_descendants_chars(ONT, annotations="manual", level2[3] )  )
+
+L2.maps<-vector("list", length(L2))
+names(L2.maps)<-names(L2)
+
+# batch stacking
+for (i in 1:length(L2.maps))
+{
+  map<-paramo(cc[[i]], ntrees=10, dirW=dirW)
+  L2.maps[[i]]<-map
+}
+
+#############
+# Level 3 stacks - entire phenotype
+#############
+level3
+cc3<-lapply(L3, function(x) sub("CHAR:", "C", x) )
+cc3<-lapply(cc3, function(x) sub(",", "-", x) )
+
+
+L3.maps<-vector("list", length(L3))
+names(L3.maps)<-names(L3)
+
+# batch stacking
+for (i in 1:length(L3.maps))
+{
+  map<-paramo(cc3[[i]], ntrees=10, dirW=dirW)
+  L3.maps[[i]]<-map
+}
+
+
+```
+
+
+```{r}
+plot(L2.maps$head[[1]], pts=F,ftype="off")
+```
+
+
+Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Cmd+Option+I*.
+
+When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Cmd+Shift+K* to preview the HTML file). 
+
+The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
+
+
+# References
+
+

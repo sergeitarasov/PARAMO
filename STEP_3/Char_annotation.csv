@@ -1,0 +1,8 @@
+CHAR_ID,CHAR_ID2,CHAR*,CHAR_STATEMENT,HAO_ID,HAO_ID_NAME
+C1,1,3,Notch on medial margin of eye,HAO:0000234,cranium
+"C3,2","3,2","25, 23",Labrum + Position of labrum,HAO:0000639,mouthparts
+C4,4,353,Forewing  costal and radial vein fusion,HAO:0000351,fore wing
+"C5,6","5,6",363,"Hind wing  subcostal  SC  vein, present ",HAO:0000400,hind wing
+C7,7,380,Inner posterior mesotibial spur,HAO:0001351,mesotibia
+C8,8,381,Foretibial apical sensillum,HAO:0000350,fore tibia
+C9,9,382,Metatibial apical sensillum,HAO:0000631,metatibia
