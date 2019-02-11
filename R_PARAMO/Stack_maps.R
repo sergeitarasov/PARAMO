@@ -66,13 +66,62 @@ color<-hm.palette(length(states))
 plotSimmap(z, setNames(color, states),  lwd=3, pts=F,ftype="off")
 plot(tr[[1]])
 
-
-stack_stm(stack.L[c(1,6)])
-stack.L[4]
-
-closeAllConnections()
-
-countSimmap(tree=mat2, states=NULL, message=TRUE)
-
-showConnections (all=T)
 #####################################################################
+setwd("~/Documents/Recon-Anc_Anat/PARAMO/STEP_5/Discr_maps/maps_pics")
+
+z<-L2.maps$head[[1]]
+z<-L2.maps$wings[[1]]
+z<-L2.maps$legs[[1]]
+
+z<-L3.maps$whole_organism[[1]]
+
+lapply(z$maps, names) %>% unlist %>% unique->states
+hm.palette <- colorRampPalette(brewer.pal(9, 'Set1'), space='Lab')
+color<-hm.palette(length(states))
+
+plotSimmap(z, setNames(color, states),  lwd=3, pts=F,ftype="off")
+
+svg(filename='head.svg')
+plotSimmap(z, setNames(color, states),  lwd=3, pts=F,ftype="off")
+dev.off()
+
+svg(filename='wings.svg')
+plotSimmap(z, setNames(color, states),  lwd=3, pts=F,ftype="off")
+dev.off()
+
+svg(filename='legs.svg')
+plotSimmap(z, setNames(color, states),  lwd=3, pts=F,ftype="off")
+dev.off()
+
+
+
+lapply(z$maps, names) %>% unlist %>% unique->states
+hm.palette <- colorRampPalette(brewer.pal(8, 'Set1'), space='Lab')
+color<-hm.palette(length(states))
+
+svg(filename='all_body.svg')
+plotSimmap(z, setNames(color, states),  lwd=3, pts=F,ftype="off")
+dev.off()
+
+# intial characters
+setwd("~/Documents/Recon-Anc_Anat/PARAMO/STEP_5/Discr_maps")
+hh<-phytools::read.simmap(file="C3-2.stmr", format="phylip")
+plot(hh[[4]])
+
+
+svg(filename='inti1.svg')
+plotSimmap(hh[[5]],  lwd=3, pts=F,ftype="off")
+dev.off()
+
+svg(filename='inti2.svg')
+plotSimmap(hh[[2]],  lwd=3, pts=F,ftype="off")
+dev.off()
+
+svg(filename='inti3.svg')
+plotSimmap(hh[[3]],  lwd=3, pts=F,ftype="off")
+dev.off()
+
+
+svg(filename='inti4.svg')
+plotSimmap(hh[[1]],  lwd=3, pts=F,ftype="off")
+dev.off()
