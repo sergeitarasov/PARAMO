@@ -2,22 +2,30 @@
 title: "PARAMO pipeline"
 output:
    html_notebook: default
+   pdf_document: default
    html_document:
      df_print: paged
-   pdf_document: default
 bibliography: bibliography.bib
 ---
 ***P**hylogenetic **A**ncestral **R**econstruction of **A**natomy by **M**apping **O**ntologies*
 
+<p align="left">
+  <img src="icon-paramo.png" width="100" title="hover text">
+</p>  
+
+
+
 ```{r setup, include=FALSE}
-library("knitr", lib.loc="/Library/Frameworks/R.framework/Versions/3.5/Resources/library")
-library("magrittr", lib.loc="/Library/Frameworks/R.framework/Versions/3.5/Resources/library")
+library("knitr")
+library("magrittr")
 library(kableExtra)
 ###--- Update the knitr working directory (R works from the project folder, knitr works in the rmd folder)
-dd <- getwd()
-knitr::opts_knit$set(root.dir= paste(dd,'/../../')) 
+#dd <- getwd()
+#knitr::opts_knit$set(root.dir= paste(dd,'/../../')) 
 #opts_knit$set(root.dir=normalizePath('../'))
 ```
+
+$PARAMO$ pipeline requires three initial pieces of data: character matrix, dated phylogeny, and anatomy ontology. Herein, we use a of 9 characters and 87 species from the large-scale phylogeny of Hymenoptera @sharkey2012phylogenetic, this dataset was slightly modified for the demonstrative purpose. For reconstructing character histories, we use the dated phylogeny of @klopfstein2013hymenopteran, and for characters-ontology linking, we use Hymenoptera Anatomy Ontology [HAO, @yoder2010gross]. In this demonstration, we are interested in constructing the amalgamated characters for the three leveles of amalgamation (=anatomical hierarchy): anatomical dependecies (AD), body regions (BRs) and entire phenotype (EF). At the BR level, three main body regions are considered -- "head", "legs" and "wings". 
 
 
 # STEP 1. Initial character matrix
@@ -175,13 +183,13 @@ cat(in.rev) # COPY the output and insert in Rev template PARAMO2_templ.Rev
 #cat(in.rev, file="STEP_4/input_Rev.txt") # or save this outout to a file and then copy to Rev template
 ```
 
-Now having created the files for inference using RevBayes we just run them. Each output consists of four files: log file, ancestral character state reconstruction (asr), and stochastim maps (stm).
+Now having created the files for the inference, we run RevBayes. Each RevBayes output consists of four files: log file, ancestral character state reconstruction (asr), and stochastim maps (stm).
 
 # STEP 5. Ontology-informed amalgamation of the stochastic maps
 
-Our goal is to assess the anatomical evolution at three levels of resolution. (1) The first level are 7  elemntary anatomical characters obtained at the previous step. (2) The second level deals with three chracters - "head", "wings" and "legs" - corresponding to the main body parts. (3) The third level corresponds to the enitre organismal phenotype. We construct the characters for the level 2 and 3 by quering the elementary anatomical characters using HAO and amalgamting their stochastic maps. 
+Our goal is to construct the amalgamated characters for the AD, BR and EF levels of anatomical hierarchy. The AD level exibits the individual stochastic maps obtained at the previous step. At this step, we will constrauct characters for BR and EF levels using ontology-informed amalgamatiion of the stochastic maps.  At the BR level, three main body regions are considered -- "head", "legs" and "wings". 
 
-Before starting ontology-informed amalgamation of characters let us first fix potential issues with maipulating data. TO enable amalgamation we first descriteze each stochastic map - each tree branch is split into small bins, each bin contains infroamtion what characer state it is in. The dicretization facilitates character amalgamation but subtantially increseas file size.To make the computations efficient we keep stm file in zip archives. 
+Before starting ontology-informed amalgamation of characters, let us first fix potential issues with data maipulation. To amalgamate maps, they first have to be descritezed -- each tree branch is split into small bins, whereas each bin indicates the state of a charatcer. This dicretization facilitates character amalgamation but may subtantially increseas memory usage in `R` if map samples and trees are large. To make the computations efficient, we put each stochastic map in a seprate `.rds` file, then we put all of these files belonging to the same character into a seprate zip archive. This trick avoids use of bunch of separate files and, at the same time, allows getting access to the individual maps upon demand. 
 
 ```{r eval=FALSE}
 library("phytools")
@@ -264,7 +272,7 @@ for (i in 1:length(c))
 
 ```
 
-Now having stochastic maps in proper format we can start their ontology-guided amalgamation
+Now having the stochastic maps converted to the proper format, we can start their ontology-guided amalgamation.
 ```{r results='hide'}
 source("R_PARAMO/Functions_Stack_maps.R")
 
@@ -272,7 +280,7 @@ source("R_PARAMO/Functions_Stack_maps.R")
 dirW= ("STEP_5/Discr_maps/")
 dirR= ("STEP_4/RevBayes/output/")
 #############
-# Level 2 stacks - main body parts
+# Level 2 stacks - Body regions
 #############
 level2
 cc<-lapply(L2, function(x) sub("CHAR:", "C", x) )
@@ -291,7 +299,7 @@ for (i in 1:length(L2.maps))
 }
 
 #############
-# Level 3 stacks - entire phenotype
+# Level 3 stacks - Entire phenotype
 #############
 level3
 cc3<-lapply(L3, function(x) sub("CHAR:", "C", x) )
@@ -314,12 +322,30 @@ for (i in 1:length(L3.maps))
 
 ```{r}
 library("phytools")
-# plot head character
+
+#########
+# BR level
+########
+
+# plot one stochastic maps for the head character
 plotSimmap(L2.maps$head[[1]], pts=F,ftype="off", ylim=c(0,100) )
 title("\n Head character")
 
+# plot one stochastic maps for the wings character
+plotSimmap(L2.maps$wings[[1]], pts=F,ftype="off", ylim=c(0,100) )
+title("\n Wings character")
 
-# plot entire phenotype character
+# plot one stochastic maps for the legs character
+plotSimmap(L2.maps$legs[[1]], pts=F,ftype="off", ylim=c(0,100) )
+title("\n Legs character")
+
+
+#########
+# EF level
+#########
+
+# plot one stochastic maps for the entire phenotype character
+# first, let's define color pallette for the characters sonce it contains many states
 library("RColorBrewer")
 tmm<-L3.maps$whole_organism[[1]]
 lapply(tmm$maps, names) %>% unlist %>% unique->states
