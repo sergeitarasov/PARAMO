@@ -1,4 +1,4 @@
-CHAR_ID,CHAR*,CHAR_STATEMENT,STATE_0,STATE_1,STATE_2,STATE_3
+ID,ID*,CHAR_STATEMENT,STATE_0,STATE_1,STATE_2,STATE_3
 C1,3,Notch on medial margin of eye,absent,present,,
 "C3,2","25, 23",Labrum + Position of labrum,"absent, anterior","absent, posterior","present, anterior","present, posterior"
 C4,353,Forewing  costal and radial vein fusion,not_fused,fused_along_their_lengths,,

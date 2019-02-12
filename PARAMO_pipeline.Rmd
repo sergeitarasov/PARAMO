@@ -1,8 +1,8 @@
 ---
 title: "PARAMO pipeline"
 output:
-   html_notebook: default
    pdf_document: default
+   html_notebook: default
    html_document:
      df_print: paged
 bibliography: bibliography.bib
@@ -25,22 +25,22 @@ library(kableExtra)
 #opts_knit$set(root.dir=normalizePath('../'))
 ```
 
-$PARAMO$ pipeline requires three initial pieces of data: character matrix, dated phylogeny, and anatomy ontology. Herein, we use a of 9 characters and 87 species from the large-scale phylogeny of Hymenoptera @sharkey2012phylogenetic, this dataset was slightly modified for the demonstrative purpose. For reconstructing character histories, we use the dated phylogeny of @klopfstein2013hymenopteran, and for characters-ontology linking, we use Hymenoptera Anatomy Ontology [HAO, @yoder2010gross]. In this demonstration, we are interested in constructing the amalgamated characters for the three leveles of amalgamation (=anatomical hierarchy): anatomical dependecies (AD), body regions (BRs) and entire phenotype (EF). At the BR level, three main body regions are considered -- "head", "legs" and "wings". 
+$PARAMO$ pipeline requires three initial pieces of data: character matrix, dated phylogeny, and anatomy ontology. Herein, we use a of 9 characters and 87 species from the large-scale phylogeny of Hymenoptera [@sharkey2012phylogenetic], this dataset was slightly modified for the demonstrative purpose. For reconstructing character histories, we use the dated phylogeny of [@klopfstein2013hymenopteran], and for characters-ontology linking, we use Hymenoptera Anatomy Ontology [HAO [@yoder2010gross]]. In this demonstration, we are interested in constructing the amalgamated characters for the three leveles of amalgamation (=anatomical hierarchy): anatomical dependecies (ADs), body regions (BRs) and entire phenotype (EF). At the BR level, three main body regions are considered -- "head", "legs" and "wings". 
 
 
 # STEP 1. Initial character matrix
-Our initial character matrix consists of a sample of 9 characters scored for 87 taxa of Hymenoptera. These characters are taken from the large Hymenoptera dataset of  @sharkey2012phylogenetic and slightly modified for the demonstrative purpose.
-The nexus file of the intial matrix can be found at `STEP_1/Step1_matrix.nex` and viewed using, for example, [Mesquite](http://www.mesquiteproject.org). Below, in describing characters, the follwoing notation is used $C_\#\{S_1,S_2,...\}$ where $C_\#$ stands for a character ID and $S_1, S_2, ...$ stand for character states. Let us have a look at the character report.
+Our initial character matrix consists of a sample of 9 characters. The nexus file of the intial matrix can be found at `STEP_1/Step1_matrix.nex` and viewed using, for example, [Mesquite](http://www.mesquiteproject.org). Below, in describing characters, the follwoing notation is used $C_\#\{S_1,S_2,...\}$ where $C_\#$ stands for a character ID and $S_1, S_2, ...$ stand for character states. Let us have a look at the character report.
 
 ```{r table, echo=FALSE}
 CH<-read.csv(file="STEP_1/Char_info.csv", header = T, as.is=T, check.names=F)
 
-# kable(CH, caption = 'Initial characters. CHAR*- char id in Sharkey et al. (2012) ')%>%
-#   kable_styling(full_width = F, font_size=11) %>%
-#   column_spec(1, bold = T) %>%
-#   column_spec(6, width = "10em")
-#   #column_spec(2, width = "10em")
-CH
+kable(CH[,c(1:6)],  booktabs=TRUE,
+      caption = 'Initial characters obtained at Step 1. ')%>%
+  kable_styling(full_width = F, font_size=8, latex_options="hold_position") %>%
+  column_spec(1, bold = T) %>%
+  column_spec(6, width = "10em") %>%
+  footnote(c("ID - character ID in this study.",
+    "IDR*- character ID in Sharkey et al. (2012)."))
 ```
 
  Note, the two pairs of characters in the matrix  $\{C_2, C_3\}$ and $\{C_5, C_6\}$ are subjected to anatomical dependencies.
@@ -51,38 +51,49 @@ CH
 
 # Step 2. Incorporating anatomical dependencies: constructing amalgamations at the AD level
 
-The pairs of anatomically depenent characters -- $C_2$, $C_3$ and $C_5$, $C_6$ have to be apropriately amalgamated into single characters to adeuqtely model the dependecies. The amalgamation produces the following (see the text in the article):
+The two pairs of anatomically depenent characters -- $C_2$, $C_3$ and $C_5$, $C_6$ have to be apropriately amalgamated into single characters to adeuqtely model the dependecies. The amalgamation produces the following two characters (see the text in the article):
 
 * $C_3 \oplus C_2=C_{3,2}\{00,01,10,11\}$. $C_\{3,2\}$  is coded in the matrix as  $C_{3,2}\{0\&1,0\&1,2,3\}$.
 
 * $C_5$ and $C_6$ are combinded into $C_\{5,6\}$. The synchronous dependency between these characters has to be eliminated that gives the character $C_{5,6}$ without changing the state pattern.
 
-The recoding of dependent characters constructs the amalgamated characters at the AD level. If a character does not display any dependencies then we treat it as correctly amalgamated at the AD level by default. The new matrix and character report of the characters amalgamated at the AD level can be found in `STEP_2/Step2_matrix.nex` and `STEP_2/Char_info_step_2.csv` respectively. Let's have a look into them.
+The recoding of dependent characters constructs the amalgamated characters at the AD level. If a character does not display any dependencies then we treat it as correctly amalgamated at the AD level by default. Let's have a look at the new character report.
 ```{r}
-
-
 CH2<-read.csv(file="STEP_2/Char_info_step_2.csv", header = T, as.is=T, check.names=F)
-CH2
-# kable(CH2, caption = 'Anatomical characters. CHAR*- char id in Sharkey et al. (2012) ')%>%
-#   kable_styling(full_width = F, font_size=11) %>%
-#   column_spec(1, bold = T) 
 
+kable(CH2, booktabs=TRUE,
+      caption = 'Characters recoded for the AD level amalgamation (Step 2).')%>%
+  kable_styling(full_width = F, font_size=8, latex_options="hold_position") %>%
+  column_spec(1, bold = T) %>%
+  column_spec(6, width = "5em") %>%
+  column_spec(7, width = "5em") %>%
+  footnote(c("ID - character ID in this study.",
+    "IDR*- character ID in Sharkey et al. (2012)."))
+```
+
+The new matrix of the recoded characters can be found in `STEP_2/Step2_matrix.nex` and `STEP_2/matrix.csv`. Here is the part of this matrix.
+
+```{r}
 # characters matrix
 MT<-read.csv("STEP_4/matrix.csv", header = T, row.names=1, as.is=T, check.names=F)
-MT
+kable(MT[c(1:10),], booktabs=TRUE,
+      caption = 'Characters matrix obtained at Step 2.')%>%
+  kable_styling(full_width = F, font_size=8, latex_options="hold_position")
 ```
 
 
 # STEP 3. Linking anatomical characters with ontology
 
-Having initial characters properly coded to account for anatomical dependecies, let's move on character-ontology linking. The Table below shows the Hymenoptera characters linked 
+Having initial characters properly coded to account for the anatomical dependecies, let's move on character-ontology linking. The table below shows the Hymenoptera characters linked 
 with the terms of Hymenoptera Anatomy Ontology [HAO](http://portal.hymao.org/projects/32/public/ontology/). This table will be used in \textit{"Retrieve all characters"} ($RAC$) query that retrives all characters asscoaited with an input ontology term.
 ```{r}
 AN<-read.csv(file="STEP_3/Char_annotation.csv", header = T, as.is=T, check.names=F)
-AN
+kable(AN, booktabs=TRUE,
+      caption = 'Characters linked with HAO terms (Step 3).')%>%
+  kable_styling(full_width = F, font_size=8, latex_options="hold_position")
 ```
 
-To run $RAC$, we use `ontologyIndex` package and a set of preccoked `R` functions located in `PARAMO_functions.R`. For our demonstrative purposes $RAC$ is supposed to work with the BR and EF levels of amalgamation; remember that, at the BR level, we condider three body regions "head", "wings" and "legs".  So, let's test our query. First of all, we need to make character-ontology to be a part of the  ontolgy graph.
+To run $RAC$, we use `ontologyIndex` package and a set of preccoked `R` functions located in `R_PARAMO/PARAMO_functions.R`. For our demonstrative purposes $RAC$ is supposed to work with the BR and EF levels of the amalgamation. So, let's test our query for BR ("head", "wings" and "legs") and EF terms. First of all, we need to make character-ontology to be a part of the  ontolgy graph.
 ```{r}
 library("ontologyIndex")
 source("R_PARAMO/PARAMO_functions.R")
@@ -91,40 +102,44 @@ source("R_PARAMO/PARAMO_functions.R")
 ONT<-get_OBO("STEP_3/HAO.obo", extract_tags="everything", propagate_relationships = c("BFO:0000050", "is_a"))
 
 # let's create  "annot" list of anotations from the annotation table
-char_id<-paste0("CHAR:", AN$CHAR_ID2)
-annot<-set_names(table2list(AN[,c(2,5)]), char_id)
+char_id<-paste0("CHAR:", AN$ID2)
+annot<-set_names(table2list(AN[,c(2,4)]), char_id)
 
 # next we make the annotations to be the part of the ontology object ONT
 ONT$terms_selected_id<-annot
 ```
 
-Now, we can construct and query the vectors of HAO terms that correspond to the focal BRs and EF.
+Now, we can construct and query the vectors of HAO terms that correspond to the focal BRs and EF. We will use the results of this query at Step 5.
 ```{r}
-# BR level
-level2<-set_names(c("HAO:0000397", "HAO:0001089", "HAO:0000494"), c("head", "wings", "legs") )
+# BR level, HAO terms
+levelBR<-set_names(c("HAO:0000397", "HAO:0001089", "HAO:0000494"), 
+                   c("head", "wings", "legs") )
 
-# EF level
-level3<-set_names(c("HAO:0000012"), c("whole_organism") )
+# EF level, HAO terms
+levelEF<-set_names(c("HAO:0000012"), 
+                   c("whole_organism") )
 
 # we use get_descendants_chars to get the set of all anatomcal characters that descend from a particular HAO term, for example:
 #get_descendants_chars(ONT, annotations="manual", terms="HAO:0000012")
 
-# now we can query all characters for the level 2 and 3 using the Ontology
-L2<-lapply(level2, function(x)
+# now we can use RAC query for the BR and EF levels using the ontology
+#BR level
+BR<-lapply(levelBR, function(x)
   get_descendants_chars(ONT, annotations="manual", terms=x)  )
-"Level 2"
-L2
+cat("BR LEVEL\n")
+BR
 
-L3<-lapply(level3, function(x)
+#EF level
+EF<-lapply(levelEF, function(x)
   get_descendants_chars(ONT, annotations="manual", terms=x)  )
-"Level 3"
-L3
+cat("EF LEVEL\n")
+EF
 ```
 
 
 # STEP 4. Inference: linking characters with models and tree
 
-At this step, we need to construct data files for analysing the set of our seven individual characters (obtained at Step 2) using RevBayes. Three files have to be created for each character: (1) chraracter file, (2) RevBayes script, and (3) tree file that is shared accross all chracters. The process of file cretion can be automitized using the following scripts.
+At this step, we need to construct data files for analysing the set of our seven individual characters (obtained at Step 2) using RevBayes. The three files have to be created for each character: (1) chraracter file `.char` (`STEP_4/RevBayes/data/`), (2) RevBayes script `.Rev` (`STEP_4/RevBayes/`), and (3) tree file `.tre` that is shared accross all chracters (`STEP_4/RevBayes/data/`). The process of file cretion can be automitized using the following scripts.
 ```{r eval=FALSE, include=TRUE}
 # reading chracter matrix
 MT<-read.csv("STEP_4/matrix.csv", header = T, row.names=1, as.is=T, check.names=F)
@@ -142,7 +157,7 @@ for (i in 1:ncol(MT))
 }
 
 # write Rev file for the two-state characters
-setwd("~/Documents/Recon-Anc_Anat/Supplementary_materials/STEP_4/RevBayes/")
+#setwd("~/Documents/Recon-Anc_Anat/Supplementary_materials/STEP_4/RevBayes/")
 
 # For constructing .Rev files we use the procooked template "PARAMO2_templ.Rev"
 fl.in  <- readLines("PARAMO2_templ.Rev")
@@ -163,7 +178,7 @@ setwd("~/Documents/Recon-Anc_Anat/Supplementary_materials")
 
 
 # I use precooked set of functions for constracting SMM from Tarasov (2019)
-source("STEP_4/SMM_functions.R")
+source("R_PARAMO/SMM_functions.R")
 
 ###################################
 # same SMMs as for the tail color problem
@@ -183,13 +198,9 @@ cat(in.rev) # COPY the output and insert in Rev template PARAMO2_templ.Rev
 #cat(in.rev, file="STEP_4/input_Rev.txt") # or save this outout to a file and then copy to Rev template
 ```
 
-Now having created the files for the inference, we run RevBayes. Each RevBayes output consists of four files: log file, ancestral character state reconstruction (asr), and stochastim maps (stm).
+Now having created the files for the inference, we run RevBayes. Each RevBayes output consists of four files located in `STEP_4/RevBayes/output/`: log file, ancestral character state reconstruction (asr), and stochastim maps (stm).
 
-# STEP 5. Ontology-informed amalgamation of the stochastic maps
-
-Our goal is to construct the amalgamated characters for the AD, BR and EF levels of anatomical hierarchy. The AD level exibits the individual stochastic maps obtained at the previous step. At this step, we will constrauct characters for BR and EF levels using ontology-informed amalgamatiion of the stochastic maps.  At the BR level, three main body regions are considered -- "head", "legs" and "wings". 
-
-Before starting ontology-informed amalgamation of characters, let us first fix potential issues with data maipulation. To amalgamate maps, they first have to be descritezed -- each tree branch is split into small bins, whereas each bin indicates the state of a charatcer. This dicretization facilitates character amalgamation but may subtantially increseas memory usage in `R` if map samples and trees are large. To make the computations efficient, we put each stochastic map in a seprate `.rds` file, then we put all of these files belonging to the same character into a seprate zip archive. This trick avoids use of bunch of separate files and, at the same time, allows getting access to the individual maps upon demand. 
+Before starting ontology-informed amalgamation of characters, let us first fix potential issues with data maipulation. To amalgamate stochastic maps, we first have to descriteze them -- each tree branch is split into small bins, whereas each bin indicates the state of a charatcer. This dicretization facilitates stochastic map amalgamation but may critically increseas memory usage in `R` (if map samples and trees are large). To make the memory usage efficient, we put each stochastic map in a seprate `.rds` file, then we put all `.rds` files belonging to the same character into a seprate `.zip` archive. This trick prevents `R` to collapse and, at the same time, allows getting access to the individual maps upon demand. You may want to skip this substep and proceed directly to the next step dealiang with amalgamation of the stochastic maps (the `.zip` archives obtained at this substep are in `STEP_4/RevBayes/Discr_maps`).
 
 ```{r eval=FALSE}
 library("phytools")
@@ -221,8 +232,7 @@ for (i in 1:length(c))
 
 #####################################
 # Read stmR, discretize maps, and save each map as a separate rds file; 
-# in turn all rds file for a chracter are stored 
-# in a zip archive
+#all rds filea for a chracter are stored in a zip archive
 #####################################
 
 for (i in 1:length(c))
@@ -272,7 +282,13 @@ for (i in 1:length(c))
 
 ```
 
-Now having the stochastic maps converted to the proper format, we can start their ontology-guided amalgamation.
+
+
+# STEP 5. Ontology-informed amalgamation of the stochastic maps
+
+Now having the stochastic maps in the proper format, we can start with their ontology-informed amalgamation. Our goal is to construct the amalgamated characters for the AD, BR and EF levels of anatomical hierarchy. The AD level exibits the individual stochastic maps obtained at the previous step (`STEP_4/RevBayes/Discr_maps`). At this step, we will constrauct characters for BR and EF levels using ontology-informed amalgamatiion of the stochastic maps.  Remeber that, at the BR level,  we considered three main body regions -- "head", "legs" and "wings". The stochstic map amalagantion is done using the results of the $RAC$ query from Step 3.
+
+
 ```{r results='hide'}
 source("R_PARAMO/Functions_Stack_maps.R")
 
@@ -280,45 +296,52 @@ source("R_PARAMO/Functions_Stack_maps.R")
 dirW= ("STEP_5/Discr_maps/")
 dirR= ("STEP_4/RevBayes/output/")
 #############
-# Level 2 stacks - Body regions
+# Amalgamation at the BR level
 #############
-level2
-cc<-lapply(L2, function(x) sub("CHAR:", "C", x) )
+# we use the ouput `BR` from the RAC query obtained at Step 3. 
+# This ouput contains character IDs for BR terms
+# Let's rename those IDs to match the file names of the stochastic maps
+cc<-lapply(BR, function(x) sub("CHAR:", "C", x) )
 cc<-lapply(cc, function(x) sub(",", "-", x) )
 
+# creating BR.maps to store the amalagamations
+BR.maps<-vector("list", length(BR))
+names(BR.maps)<-names(BR)
 
-L2.maps<-vector("list", length(L2))
-names(L2.maps)<-names(L2)
-
-# batch stacking
-
-for (i in 1:length(L2.maps))
+# run amalgamation using the renamed outputs from RAC query
+# this loop construct one amalgamation for each BR term
+# the number of amalgamations per term can be specified using `ntrees=`
+for (i in 1:length(BR.maps))
 {
   map<-paramo(cc[[i]], ntrees=1, dirW=dirW)
-  L2.maps[[i]]<-map
+  BR.maps[[i]]<-map
 }
 
 #############
-# Level 3 stacks - Entire phenotype
+# Amalgamation at the EF level
 #############
-level3
-cc3<-lapply(L3, function(x) sub("CHAR:", "C", x) )
+# we use the ouput `EF` from the RAC query obtained at Step 3. 
+# This ouput contains character IDs for EF term
+# Let's rename those IDs to match the file names of the stochastic maps
+cc3<-lapply(EF, function(x) sub("CHAR:", "C", x) )
 cc3<-lapply(cc3, function(x) sub(",", "-", x) )
 
+# creating EF.maps to store the amalagamations
+EF.maps<-vector("list", length(EF))
+names(EF.maps)<-names(EF)
 
-L3.maps<-vector("list", length(L3))
-names(L3.maps)<-names(L3)
-
-# batch stacking
-for (i in 1:length(L3.maps))
+# run amalgamation using the renamed outputs from RAC query
+# this code will return 10 amalgamated stochastic maps of the EF character
+for (i in 1:length(EF.maps))
 {
   map<-paramo(cc3[[i]], ntrees=10, dirW=dirW)
-  L3.maps[[i]]<-map
+  EF.maps[[i]]<-map
 }
 
 
 ```
 
+Now let us plot the amalgamated character hostories for BR and EF characters.
 
 ```{r}
 library("phytools")
@@ -328,15 +351,15 @@ library("phytools")
 ########
 
 # plot one stochastic maps for the head character
-plotSimmap(L2.maps$head[[1]], pts=F,ftype="off", ylim=c(0,100) )
+plotSimmap(BR.maps$head[[1]], pts=F,ftype="off", ylim=c(0,100) )
 title("\n Head character")
 
 # plot one stochastic maps for the wings character
-plotSimmap(L2.maps$wings[[1]], pts=F,ftype="off", ylim=c(0,100) )
+plotSimmap(BR.maps$wings[[1]], pts=F,ftype="off", ylim=c(0,100) )
 title("\n Wings character")
 
 # plot one stochastic maps for the legs character
-plotSimmap(L2.maps$legs[[1]], pts=F,ftype="off", ylim=c(0,100) )
+plotSimmap(BR.maps$legs[[1]], pts=F,ftype="off", ylim=c(0,100) )
 title("\n Legs character")
 
 
@@ -347,7 +370,7 @@ title("\n Legs character")
 # plot one stochastic maps for the entire phenotype character
 # first, let's define color pallette for the characters sonce it contains many states
 library("RColorBrewer")
-tmm<-L3.maps$whole_organism[[1]]
+tmm<-EF.maps$whole_organism[[1]]
 lapply(tmm$maps, names) %>% unlist %>% unique->states
 # number of states in the character
 #length(states)
